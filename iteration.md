@@ -32,11 +32,11 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec))/ sd(x_vec)  # these are z scores now, kind of thing we cant to do in a body of function
 ```
 
-    ##  [1] -0.64006851  0.05707567  0.41459930 -0.39204501 -1.65087203 -0.22689116
-    ##  [7] -0.42253866  0.77407277 -0.27202104  1.00020837  0.80220933  0.02353142
-    ## [13]  0.36147510  1.78717159 -0.93316650  0.74610198 -1.70805423 -1.75478189
-    ## [19] -1.28827117  0.55216267  0.34778772  0.45121651 -0.62787910 -1.69038888
-    ## [25]  0.72486590 -0.41516656  0.97160346  1.98133420  1.06302080 -0.03629204
+    ##  [1] -0.2852012 -0.6738401  0.5020353 -0.4167547  1.0015668 -0.3832419
+    ##  [7]  2.1328568 -1.7373453  0.6938268  0.3477105 -0.3063864  0.8786643
+    ## [13]  0.3047099 -1.3388047 -0.7391574 -1.4714097 -0.2662500 -1.2164694
+    ## [19]  0.1540060 -0.8265098  0.7213243 -0.1713973  0.9943462  1.4671600
+    ## [25]  1.0188967  1.9864745 -1.3828940 -0.3483732 -0.1129375 -0.5266053
 
 I want a function to compute z scores
 
@@ -55,11 +55,11 @@ return(z)
 z_scores(x_vec)    #same answer as function above! 
 ```
 
-    ##  [1] -0.64006851  0.05707567  0.41459930 -0.39204501 -1.65087203 -0.22689116
-    ##  [7] -0.42253866  0.77407277 -0.27202104  1.00020837  0.80220933  0.02353142
-    ## [13]  0.36147510  1.78717159 -0.93316650  0.74610198 -1.70805423 -1.75478189
-    ## [19] -1.28827117  0.55216267  0.34778772  0.45121651 -0.62787910 -1.69038888
-    ## [25]  0.72486590 -0.41516656  0.97160346  1.98133420  1.06302080 -0.03629204
+    ##  [1] -0.2852012 -0.6738401  0.5020353 -0.4167547  1.0015668 -0.3832419
+    ##  [7]  2.1328568 -1.7373453  0.6938268  0.3477105 -0.3063864  0.8786643
+    ## [13]  0.3047099 -1.3388047 -0.7391574 -1.4714097 -0.2662500 -1.2164694
+    ## [19]  0.1540060 -0.8265098  0.7213243 -0.1713973  0.9943462  1.4671600
+    ## [25]  1.0188967  1.9864745 -1.3828940 -0.3483732 -0.1129375 -0.5266053
 
 ``` r
 # update your function, using conditional execution 
@@ -108,3 +108,118 @@ z_scores(c(TRUE, TRUE, FALSE,TRUE))  #works bc will coerce to 0 and 1s
 ```
 
     ## Error in z_scores(c(TRUE, TRUE, FALSE, TRUE)): Argument x should be numeric
+
+## Multiple Outputs
+
+``` r
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) <3) {
+  stop("Input must have at least 3 numbers")
+    
+  }
+  
+mean_x = mean(x)   # instead of computing mean and sd , we want both
+sd_x = sd(x)
+
+list(mean = mean_x,
+    sd= sd_x)
+
+}
+
+
+#Alternatively, we might store values in a data frame.
+
+mean_and_sd = function(x) {
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) <3) {
+  stop("Input must have at least 3 numbers")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+```
+
+Check if the functions work
+
+``` r
+#x_vec = rnorm(100) #we can change the vector and compute its sd 
+
+x_vec = rnorm(100, mean = 3, sd=4)
+
+mean_and_sd(x_vec)  # we get the mean and std deviation 
+```
+
+    ## # A tibble: 1 × 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  2.69  3.80
+
+## Multiple Inputs
+
+If wanted to run with different sample sizes, means, and standard
+deviations. So, give me the mean and sd and spit things out
+
+``` r
+sim_data=
+  tibble(
+    
+    x= rnorm(100, mean = 4, sd =3)  # creating a tibble (table of values), with diff mean and SD
+  )
+
+sim_data %>% 
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+```
+
+    ## # A tibble: 1 × 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  4.17  2.81
+
+Translating into a function
+
+``` r
+sim_mean_sd= function(sample_size, mu, sigma) {
+  
+  
+  sim_data=
+    
+  tibble(
+    
+    x= rnorm(n= sample_size, mean = mu, sd=sigma)  # creating a tibble (table of values), with diff mean and SD
+  )
+
+  
+sim_data %>% 
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+
+}
+
+
+
+sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, st etc. we can learn about process expecting how much the mean will shift from true. 
+```
+
+    ## # A tibble: 1 × 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  6.09  2.94

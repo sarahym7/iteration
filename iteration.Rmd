@@ -101,7 +101,121 @@ z_scores(c(TRUE, TRUE, FALSE,TRUE))  #works bc will coerce to 0 and 1s
 
 
 
+## Multiple Outputs 
 
+```{r}
+
+
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) <3) {
+  stop("Input must have at least 3 numbers")
+    
+  }
+  
+mean_x = mean(x)   # instead of computing mean and sd , we want both
+sd_x = sd(x)
+
+list(mean = mean_x,
+    sd= sd_x)
+
+}
+
+
+#Alternatively, we might store values in a data frame.
+
+mean_and_sd = function(x) {
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) <3) {
+  stop("Input must have at least 3 numbers")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+
+```
+
+
+Check if the functions work 
+
+```{r}
+
+#x_vec = rnorm(100) #we can change the vector and compute its sd 
+
+x_vec = rnorm(100, mean = 3, sd=4)
+
+mean_and_sd(x_vec)  # we get the mean and std deviation 
+
+
+```
+
+
+
+## Multiple Inputs 
+
+If wanted to run with different sample sizes, means, and standard deviations. So, give me the mean and sd and spit things out 
+
+```{r}
+
+sim_data=
+  tibble(
+    
+    x= rnorm(100, mean = 4, sd =3)  # creating a tibble (table of values), with diff mean and SD
+  )
+
+sim_data %>% 
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+
+```
+
+
+
+Translating into a function
+
+```{r}
+
+sim_mean_sd= function(sample_size, mu, sigma) {
+  
+  
+  sim_data=
+    
+  tibble(
+    
+    x= rnorm(n= sample_size, mean = mu, sd=sigma)  # creating a tibble (table of values), with diff mean and SD
+  )
+
+  
+sim_data %>% 
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+
+}
+
+
+
+sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, st etc. we can learn about process expecting how much the mean will shift from true. 
+
+
+
+```
 
 
 
