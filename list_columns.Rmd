@@ -5,26 +5,170 @@ date: "2024-10-29"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
+library(rvest)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%:"
+  
+)
+
+
+theme_set(theme_minimal()+ theme(legend.position = "bottom"))
+
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Lists 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+You can put anything in a list 
 
-```{r cars}
-summary(cars)
+```{r}
+
+
+l = list (
+ # no way we can put all of this information into a dataframe so we will make a list
+vec_numeric = 5:8,
+vec_logical = c(TRUE, TRUE , FALSE, TRUE, FALSE, FALSE),
+mat = matrix(1:8, nrow = 2, ncol= 4),
+summary = summary(rnorm(100)) 
+  
+)
+
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+l  # now we have a way of storing everyhting instead of different datafra,s 
+
+
+l$vec_numeric #will give you data of just vec_numeric
+
+l[[1]] # returns first list
+
+l[["vec_numeric"]]  #also returns first list 
+
+mean(l[["vec_numeric"]]) # if accessing individual elements of the list
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+## `for` loop 
+
+Create a new list. 
+
+
+```{r}
+
+list_norm = 
+    list(
+      a = rnorm(20, mean = 3, sd= 1),
+      b = rnorm(30, mean = 0, sd= 5),
+      c = rnorm(40, mean = 10, sd= .2),
+      d = rnorm(20, mean = -3, sd= 1)
+    )
+
+#basis is that this is something that we cannot easily do individually 
+
+```
+
+
+```{r}
+
+list_norm[[1]] # first element of your list 
+```
+
+
+
+pause anf get old function 
+
+- write a function that give the mean and standard deviation
+
+```{r}
+
+
+mean_and_sd = function(x) {
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) <3) {
+  stop("Input must have at least 3 numbers")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+
+
+```
+
+I can apply this function to each list element 
+
+```{r}
+
+mean_and_sd(list_norm[[1]]) # don't forget to load libraries! , can get mean and std deviation of the lists
+mean_and_sd(list_norm[[2]])
+mean_and_sd(list_norm[[3]])
+mean_and_sd(list_norm[[4]])
+
+# even though we have a function we have to copy them 1-4 times, can be annoying if  we had 4 so we will go into for list loop
+
+
+```
+
+Let's use a for a loop 
+
+```{r}
+
+output = vector("list", length = 4)
+
+for( i in 1:4){
+
+output[[i]] = mean_and_sd(list_norm[[i]]) # possible but we're gonna have to do this 40 times and that's no fun
+
+}
+
+
+# keep track of your i and see where you have to change and replace 
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
