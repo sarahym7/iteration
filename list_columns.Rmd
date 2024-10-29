@@ -178,15 +178,86 @@ output = map(list_norm, IQR)  # you can map any functions you want across the in
 ```
 
 
+we know when we run input we get A,B,D,D and its a list. So what if its a dbl?
+
+```{r}
+
+output = map_dbl(list_norm, median)
+
+
+output = map_dbl(list_norm, median, .id = "input")
+
+```
 
 
 
 
+```{r}
+
+output = map_df(list_norm, mean_and_sd, .id = "input")  # we cant call it dbl bc they're not individual numbers, lets try to make it a df
+                                            # will take each df and collapse, keeping track of id a, b,c,d ( list names) will be helpful. tells put the list names into an input column.
+
+```
+
+
+
+We've got for loops, map statements, lists, we are keeping track of everything. we dont want all of this stuff where output came from this list etc. So we are going into list columns.
+
+
+Create a df that has a list in it. 
+
+
+
+## List Columns! 
+
+```{r}
+
+listcol_df = 
+  tibble(
+    name = c("a", "b", "c", "d"),
+    samp = list_norm
+  )
+
+# sure theres a lot of stuff but the printed table is making easier by saying you have a list in this column with a collection of dbls 
+
+```
 
 
 
 
+```{r}
+listcol_df %>%  pull(name)
+listcol_df %>%  pull(samp)
 
+# its a df and we can sample 
+
+
+listcol_df %>%  filter(name == "a")
+
+```
+
+
+
+Lets try some operations
+
+```{r}
+
+listcol_df$samp  # dollar is same as pulling and gives you a list 
+
+listcol_df$samp[[1]] 
+
+
+# we want mean and sd 
+
+
+mean_and_sd(listcol_df$samp[[1]])
+
+
+
+```
+
+
+What if we want to apply it all the way through. Can't we just map?
 
 
 
