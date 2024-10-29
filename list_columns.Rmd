@@ -2,7 +2,7 @@
 title: "lis_col"
 author: "Sarahy Martinez"
 date: "2024-10-29"
-output: html_document
+output: github_document
 ---
 
 ```{r}
@@ -154,9 +154,28 @@ output[[i]] = mean_and_sd(list_norm[[i]]) # possible but we're gonna have to do 
 
 
 
+## Let's try map! 
+
+if we can take map as a function and give input list with function we want to apply hopefull it will do the same process
+
+```{r}
+
+map(list_norm, mean_and_sd)   #gives you output same as the loop
+
+output = map(list_norm, mean_and_sd) # these two code chunks will be equivalent with the difference that map keeps track of input names
+
+```
 
 
+what if you want a different function?
 
+```{r}
+
+output = map(list_norm, median) # gives you the median instead of mean and sd 
+
+output = map(list_norm, IQR)  # you can map any functions you want across the input list, can apply functions to any element of your input list and the map statement should be clear
+
+```
 
 
 
