@@ -283,9 +283,145 @@ listcol_df =
   mutate(summary = map(samp, mean_and_sd),
          medians= map_dbl(samp, median))
 
-# we're not losing information and have vectors floating around. Everything is held in this df
+# we're not losing information and have vectors floating around. Everything is held in this df. Everything is tibbled so good. Now look at an example that is less contrived since we made up the data. 
 
 ```
+
+Using the weather data 
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USC00519397", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") |>
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USC00519397 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) |>
+  select(name, id, everything())
+
+
+```
+
+
+Get our list columns
+```{r}
+
+weather_nest = 
+  weather_df %>% 
+  nest(data = date:tmin)
+  
+  
+  #nest some of the observations in the dataset, we need to create columns we want to nest within the columns that remain. We will create new column called data and it will result from nesting everything from date to tmin
+  # notice name stays the same, data is a tibble with 365 rows and one for everyday of the year, 4 columns for data, precip, tmax,, tmin
+
+```
+
+
+
+
+```{r}
+weather_nest %>%  pull(name)
+weather_nest %>% pull(data)
+
+weather_nest$data[[1]]  
+```
+
+
+Suppose I want to regress `tmax` on `tmin` for each station 
+is tmax predicted by tmin for each station? We can do regression for a dataset and can we do it separately 
+
+```{r}
+
+
+weather_nest$data[[1]]
+
+# if what we want to do is regress weather_nest tmax on tmin and the dataset we are interested is weather_nest df1 using linear model command to regress
+
+lm(tmax~tmin, data = weather_nest$data[[3]])
+
+
+```
+
+
+
+We want a function that takes the input into an arguement 
+
+```{r}
+weather_lm = function(df){
+  
+  lm(tmax ~tmin, data =df)
+  
+}
+
+# we have a function that given an input elements of a list computes a linear model and spits the result 
+
+weather_lm(weather_nest$data[[1]])
+weather_lm(weather_nest$data[[2]])
+weather_lm(weather_nest$data[[3]])
+```
+
+
+```{r}
+
+weather_lm = function(df){
+  
+  lm(tmax ~tmin, data =df)
+  
+}
+
+output = vector("list", 3) 
+  for (i in 1:3) {
+    
+   output[[i]] = weather_lm(weather_nest$data[[i]])
+    
+  }
+
+
+
+
+
+```
+
+
+What about map?
+
+
+```{r}
+
+map(weather_nest$data , weather_lm) # a list where each element is a dataset and we want to do a map across the list 
+
+```
+
+
+What about a map in a list colulmn?
+
+```{r}
+
+weather_nest = 
+weather_nest %>% 
+  mutate( models = map(data, weather_lm))
+ #we are adding a column to store the results of linear modeling. Need to map across a column and apply the function weather_lm . Don't have to do weather_nest its implied by the tidy verse process and you are sitting within a dataframe. Now, we get a new df with names, id, data, models, 
+
+
+
+weather_nest$models 
+
+#this is telling us that if we have data nested within stations of 1,2,3 we can start doing linear models. 
+
+```
+
+
+
+
+
+
 
 
 
