@@ -259,6 +259,33 @@ mean_and_sd(listcol_df$samp[[1]])
 
 What if we want to apply it all the way through. Can't we just map?
 
+```{r}
+
+map(listcol_df$samp, mean_and_sd)
+
+# we are mapping a list col and applying the mean and sd to the listcol on the samp
+# Suppose we want to keep track of the output and its stored outside of df. We want to appy the map to the list col and save it in a df
+
+```
+
+
+Can I add a list col? Yes 
+
+```{r}
+listcol_df %>% 
+  mutate(summary = map(samp, mean_and_sd)) #to map across a column and apply the same function above, map across a colulmn in this dataset and we want ot map mean and STD. 
+
+#tibble was created! now lets do a list col df and overwrite that 
+
+
+listcol_df = 
+  listcol_df %>% 
+  mutate(summary = map(samp, mean_and_sd),
+         medians= map_dbl(samp, median))
+
+# we're not losing information and have vectors floating around. Everything is held in this df
+
+```
 
 
 
