@@ -81,7 +81,7 @@ sim_mean_sd(30)  # we can rerun but suppose we do this over and over what do the
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  3.23  4.72
+    ## 1  2.85  4.41
 
 ## Lets simulate alot…
 
@@ -114,18 +114,78 @@ bind_rows(output)
     ## # A tibble: 100 × 2
     ##     mean    sd
     ##    <dbl> <dbl>
-    ##  1  2.57  3.99
-    ##  2  5.07  4.01
-    ##  3  2.48  3.04
-    ##  4  4.32  4.02
-    ##  5  3.22  3.24
-    ##  6  3.60  3.54
-    ##  7  2.70  3.72
-    ##  8  1.54  3.70
-    ##  9  1.98  3.58
-    ## 10  2.51  4.32
+    ##  1  2.18  4.48
+    ##  2  3.08  3.83
+    ##  3  2.58  4.83
+    ##  4  2.20  4.15
+    ##  5  3.50  3.74
+    ##  6  3.48  3.83
+    ##  7  2.48  4.53
+    ##  8  2.21  3.97
+    ##  9  3.11  3.28
+    ## 10  2.49  4.25
     ## # ℹ 90 more rows
 
 ``` r
 # this is 100 times I've gone into the universe and got the mean and sd, this is what happened the first time, second, etc. 
+```
+
+Lets use a loop function
+
+Notice we only have an output but not an input list. So rn we have no
+input and we want to do the same thing over and over again. In purr we
+will use the function rerun.
+
+``` r
+sim_results = rerun( 100, sim_mean_sd(sample_size = 30)) %>% 
+  bind_rows()
+```
+
+    ## Warning: `rerun()` was deprecated in purrr 1.0.0.
+    ## ℹ Please use `map()` instead.
+    ##   # Previously
+    ##   rerun(100, sim_mean_sd(sample_size = 30))
+    ## 
+    ##   # Now
+    ##   map(1:100, ~ sim_mean_sd(sample_size = 30))
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+``` r
+# different this time bc when get ask for new sample get a new sample. but setting seed can make r start at the same point
+```
+
+Let’s look at the results
+
+``` r
+sim_results %>% 
+  ggplot(aes(x = mean)) + geom_density()
+```
+
+<img src="simulations_files/figure-gfm/unnamed-chunk-6-1.png" width="90%:" />
+
+``` r
+sim_results %>% 
+  summarize(
+    
+    avg_samp_mean = mean(mean),
+    sd_samp_mean = sd(mean)
+  )
+```
+
+    ## # A tibble: 1 × 2
+    ##   avg_samp_mean sd_samp_mean
+    ##           <dbl>        <dbl>
+    ## 1          3.03        0.669
+
+``` r
+sim_results %>% 
+  ggplot(aes(x = sd)) + geom_density()
+```
+
+<img src="simulations_files/figure-gfm/unnamed-chunk-6-2.png" width="90%:" />
+
+``` r
+# distribution of sd is harder to do because its not normally distributed 
 ```

@@ -95,7 +95,40 @@ bind_rows(output)
 # this is 100 times I've gone into the universe and got the mean and sd, this is what happened the first time, second, etc. 
 ```
 
+Lets use a loop function 
 
+Notice we only have an output but not an input list. So rn we have no input and we want to do the same thing over and over again. In purr we will use the function rerun. 
+
+
+
+```{r}
+sim_results = rerun( 100, sim_mean_sd(sample_size = 30)) %>% 
+  bind_rows()
+# different this time bc when get ask for new sample get a new sample. but setting seed can make r start at the same point
+
+```
+
+
+Let's look at the results 
+
+```{r}
+
+sim_results %>% 
+  ggplot(aes(x = mean)) + geom_density()
+
+
+sim_results %>% 
+  summarize(
+    
+    avg_samp_mean = mean(mean),
+    sd_samp_mean = sd(mean)
+  )
+
+
+sim_results %>% 
+  ggplot(aes(x = sd)) + geom_density()
+# distribution of sd is harder to do because its not normally distributed 
+```
 
 
 
