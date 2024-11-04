@@ -190,7 +190,7 @@ Translating into a function
 
 ```{r}
 
-sim_mean_sd= function(sample_size, mu, sigma) {
+sim_mean_sd= function(sample_size, mu = 3, sigma =4) {  # also provide default values, but we can overwrite it
   
   
   sim_data=
@@ -209,9 +209,15 @@ sim_data %>%
 
 }
 
-
-
 sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, st etc. we can learn about process expecting how much the mean will shift from true. 
+
+# r is assuming first number is the first arguement, then second etc 
+
+
+# we can also name match 
+
+sim_mean_sd(sample_size = 100,mu =  6, sigma = 3) # positional matching 
+sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example 
 
 
 

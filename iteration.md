@@ -32,11 +32,11 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec))/ sd(x_vec)  # these are z scores now, kind of thing we cant to do in a body of function
 ```
 
-    ##  [1] -0.52354847 -0.41526201  0.78212336  0.04366746 -1.02378196  0.46329195
-    ##  [7]  0.19890775  0.85903210  0.24350008  1.13728631 -0.09055099  0.88635148
-    ## [13] -1.19614415 -2.03618912 -0.26521683  1.04900296  1.61818427  0.73565991
-    ## [19] -1.86539731  0.19761995  1.67199937 -1.31412833 -0.25342369  1.71750382
-    ## [25] -1.22929594  0.43698177 -0.81263311 -0.57479060 -0.20600675 -0.23474330
+    ##  [1] -0.96224295  0.79320612  1.13304825  0.89420246 -0.58488700 -1.87037690
+    ##  [7]  2.81604242 -0.39428891 -0.57996390 -0.17942085 -1.50159024  0.72710077
+    ## [13]  0.47126435 -0.56419404 -1.29625262 -1.47462720  0.67495700  0.02281289
+    ## [19] -0.02375534  0.08389677  0.51413902 -0.80802568 -0.36752059  0.40384299
+    ## [25]  1.18691931  0.33065567  0.25327416  0.97978651 -1.18669691  0.50869444
 
 I want a function to compute z scores
 
@@ -55,11 +55,11 @@ return(z)
 z_scores(x_vec)    #same answer as function above! 
 ```
 
-    ##  [1] -0.52354847 -0.41526201  0.78212336  0.04366746 -1.02378196  0.46329195
-    ##  [7]  0.19890775  0.85903210  0.24350008  1.13728631 -0.09055099  0.88635148
-    ## [13] -1.19614415 -2.03618912 -0.26521683  1.04900296  1.61818427  0.73565991
-    ## [19] -1.86539731  0.19761995  1.67199937 -1.31412833 -0.25342369  1.71750382
-    ## [25] -1.22929594  0.43698177 -0.81263311 -0.57479060 -0.20600675 -0.23474330
+    ##  [1] -0.96224295  0.79320612  1.13304825  0.89420246 -0.58488700 -1.87037690
+    ##  [7]  2.81604242 -0.39428891 -0.57996390 -0.17942085 -1.50159024  0.72710077
+    ## [13]  0.47126435 -0.56419404 -1.29625262 -1.47462720  0.67495700  0.02281289
+    ## [19] -0.02375534  0.08389677  0.51413902 -0.80802568 -0.36752059  0.40384299
+    ## [25]  1.18691931  0.33065567  0.25327416  0.97978651 -1.18669691  0.50869444
 
 ``` r
 # update your function, using conditional execution 
@@ -166,7 +166,7 @@ mean_and_sd(x_vec)  # we get the mean and std deviation
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  2.41  4.43
+    ## 1  2.11  3.69
 
 ## Multiple Inputs
 
@@ -190,12 +190,12 @@ sim_data %>%
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  4.32  3.00
+    ## 1  3.62  2.63
 
 Translating into a function
 
 ``` r
-sim_mean_sd= function(sample_size, mu, sigma) {
+sim_mean_sd= function(sample_size, mu = 3, sigma =4) {  # also provide default values, but we can overwrite it
   
   
   sim_data=
@@ -214,12 +214,33 @@ sim_data %>%
 
 }
 
-
-
 sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, st etc. we can learn about process expecting how much the mean will shift from true. 
 ```
 
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  6.60  3.41
+    ## 1  5.58  3.05
+
+``` r
+# r is assuming first number is the first arguement, then second etc 
+
+
+# we can also name match 
+
+sim_mean_sd(sample_size = 100,mu =  6, sigma = 3) # positional matching 
+```
+
+    ## # A tibble: 1 × 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  5.78  2.96
+
+``` r
+sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example 
+```
+
+    ## # A tibble: 1 × 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  5.71  2.92
