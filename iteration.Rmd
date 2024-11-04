@@ -211,7 +211,7 @@ sim_data %>%
 
 sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, st etc. we can learn about process expecting how much the mean will shift from true. 
 
-# r is assuming first number is the first arguement, then second etc 
+# r is assuming first number is the first argument, then second etc 
 
 
 # we can also name match 
@@ -219,7 +219,7 @@ sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, 
 sim_mean_sd(sample_size = 100,mu =  6, sigma = 3) # positional matching 
 sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example 
 
-
+sim_mean_sd(sample_size = 100) # we dont give it the values of the others so will rely on the default
 
 ```
 
