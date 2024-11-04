@@ -25,6 +25,8 @@ options(
   ggplot2.continuous.colour = "viridis",
   ggplot2.continuous.fill = "viridis"
 )
+
+set.seed(1)
 ```
 
 
@@ -131,18 +133,131 @@ sim_results %>%
 ```
 
 
+Alot of things depend on sample size. We should see if we start changing n does the distribution of x bar change. 
+
+## Lets try other sample sizes
+
+```{r}
+
+n_list = 
+  list(
+  # our input list, things are gonna get weird bc when n =30 we say run it 500, 60 run it 100 times, the output should match the same size as the input 
+ " n = 30 " = 30,
+ " n = 60 " = 60,
+ " n = 120 " = 120,
+ " n = 240 " = 240
+  
+)
+
+output = vector("list", length = 4 )
+
+output[[1]]= rerun(100, sim_mean_sd(sample_size = n_list[[1]])) %>% bind_rows()  # rerun 100x, rerun mean and sd 100x and sample size is the size of the firs element
+
+output[[2]]= rerun(100, sim_mean_sd(sample_size = n_list[[2]])) %>% bind_rows() # can do this but we want to avoid so we are going to do a for loop
+
+
+for(i in 1:4 ){
+  
+ output[[i]] = 
+   rerun(100, sim_mean_sd(sample_size = n_list[[i]])) %>% # input we care abt and output we care , we will map this 
+   bind_rows #bind rows to make sure everything works 
+}
+
+
+```
 
 
 
 
+Start using rerun functions, map functions etc. We have a first sample size and run it 400x etc 
+We want to keep everything in a dataframe. 
+
+
+```{r}
+
+tibble(
+  
+  sample_size = c(30,60,120,240)
+) %>% 
+  mutate(
+    output_lists = map(.x = sample_size, ~ rerun(10, sim_mean_sd(.x)))#input,#function you want to apply .x is sample size
+    
+  ) %>%  pull(output_lists) # now we have a list of lists 
 
 
 
+# produces tibble size 4 with sample size 30 and list of size 10
+
+```
 
 
 
+```{r}
+sim_results = tibble(
+  sample_size = c(30,60,120,240)
+) %>% 
+  mutate(
+    output_lists = map(.x = sample_size, ~ rerun(10, sim_mean_sd(.x))),#input,#function you want to apply .x is sample size
+    estimate_df = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% #unest a dataframe, prev nested a large df to a single now we try to make larger
+  unnest(estimate_df)
+  
+# it has expanded out each of the subdataframes. now we took the tibble of estimate_df and expanded it hwhere it was 10 rows for size 30 , 60,etc. SO then now we have an overall tibble size of 40 x3 including sample size, mean and sd
+
+sim_results_1000 = tibble(
+  sample_size = c(30,60,120,240)
+) %>% 
+  mutate(
+    output_lists = map(.x = sample_size, ~ rerun(1000, sim_mean_sd(.x))),#input,#function you want to apply .x is sample size
+    estimate_df = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% #unest a dataframe, prev nested a large df to a single now we try to make larger
+  unnest(estimate_df)
+
+# now we have 4000 simulated datasets. 1000 each at 4 diff sample sizes 
 
 
+```
+
+
+Do some dataframe things 
+
+```{r}
+
+sim_results_1000 %>% 
+  mutate(
+    sample_size = str_c("n = ", sample_size),
+    sample_size = fct_inorder(sample_size) # places in order
+  ) %>% 
+  ggplot(aes( x = sample_size, y = mean)) + geom_boxplot() # now we have slight problem bc ordering doesn't make sense 
+
+# getting an idea of repeated sampling when we are discussing the mean 
+
+sim_results_1000 %>% 
+  mutate(
+    sample_size = str_c("n = ", sample_size),
+    sample_size = fct_inorder(sample_size) # places in order
+  ) %>% 
+  ggplot(aes( x = sample_size, y = mean)) + geom_violin()  
+# violin bc we can see more clearly that it is a symmetric distribution 
+
+```
+
+
+```{r}
+sim_results_1000%>% 
+  group_by(sample_size) %>% 
+  summarize(avg_samp_mean = mean(mean),
+  sd_samp_mean = sd(mean)        
+  )
+  
+# each time the avg sample mean should be where they are. not exact but are close since we are running at 1000 times.
+```
+
+Right now when we knit and hits the 100 and 1000 simulation can take a long amt of time. If we dont want to wait there is an option in R that we can CACHE the results and save them. Downside is that its easy to break. So if we are using something that takes a lont time to run we can cache the results. We can also set the seed. 
+
+set.seed will continue to give you the same numbers everytime you start setting. Everytime you knit will give you the same random numbers. 
 
 
 
