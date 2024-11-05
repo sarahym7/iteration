@@ -353,7 +353,7 @@ reviews #(output)
 
 Lets try the function.
 
-```{r}
+```{r, eval = FALSE}
 
 dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
 
@@ -388,12 +388,65 @@ read_page_reviews(dynamite_urls[4]),
 read_page_reviews(dynamite_urls[5])
 )
 
+```
+
+
+## Mean scoping example 
+
+
+
+```{r, eval=FALSE}
+
+f = function(x) {
+  z = x + y 
+  z
+}
+
+x =1 
+y = 2
+
+f(x = y) 
+
+
+# answer returns 4, when say x=y , says take 2 and plug intot the function, now thats in the function of the global environment and creates 4 
+
+
+f = function(x) {
+  z = x1 + x2 
+  z
+}
+
+x =1 
+y = 2
+
+f(x1 = 2)  # doesnt work and doesnt exists. So writing a complicated function can end up with something that breaks. You'll get an error due to scoping easily. 
 
 ```
 
 
+## Functions as arguemtents 
+Have functiona and pass into vector 
+Have function that can pass into a function 
+
+```{r, eval = FALSE}
+
+my_summary= function( x, summ_func){
+  
+ summ_func(x)
+   
+}
+
+x_vec = rnorm(100, 3, 7)
+
+mean(x_vec)
+median(x_vec)
+
+mu_summary(x_vec, IQR) 
+
+# thinking why do this? we have done it like reordering factors according to mean or the median. Other reason is bc of forshadowing and its a function we want to apply as an arguement
 
 
+```
 
 
 

@@ -34,11 +34,12 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec))/ sd(x_vec)  # these are z scores now, kind of thing we cant to do in a body of function
 ```
 
-    ##  [1]  1.20624667  1.85966525  0.01848997  2.06198939 -1.05976314  0.47909984
-    ##  [7] -1.16622956 -0.22388832  0.22466539 -1.41284717  0.17237623 -0.58245993
-    ## [13] -0.02292778 -1.24429900  0.07976235 -0.73457782  1.89281996 -0.35561902
-    ## [19] -1.17378989 -1.36800208  0.23110993 -0.38724064 -0.54885782 -0.59757416
-    ## [25] -1.07633997  0.85084099  1.37500412  0.14408864  0.56767558  0.79058197
+    ##  [1] -1.119285762 -1.899920473  0.018292780 -0.536523220 -0.006008735
+    ##  [6] -0.646954587  0.095316633  0.143025475 -1.388238016 -0.414866459
+    ## [11]  1.473682003 -1.419569696 -0.326523646  0.649911292  0.826697464
+    ## [16] -1.197970738  1.198421478  0.365217876 -0.084939064  1.174494034
+    ## [21] -1.370773688  0.350509066 -0.563345402  0.968835817 -0.564606499
+    ## [26]  2.014055151  0.975750437 -0.077454424 -0.316461023  1.679231927
 
 I want a function to compute z scores
 
@@ -57,11 +58,12 @@ return(z)
 z_scores(x_vec)    #same answer as function above! 
 ```
 
-    ##  [1]  1.20624667  1.85966525  0.01848997  2.06198939 -1.05976314  0.47909984
-    ##  [7] -1.16622956 -0.22388832  0.22466539 -1.41284717  0.17237623 -0.58245993
-    ## [13] -0.02292778 -1.24429900  0.07976235 -0.73457782  1.89281996 -0.35561902
-    ## [19] -1.17378989 -1.36800208  0.23110993 -0.38724064 -0.54885782 -0.59757416
-    ## [25] -1.07633997  0.85084099  1.37500412  0.14408864  0.56767558  0.79058197
+    ##  [1] -1.119285762 -1.899920473  0.018292780 -0.536523220 -0.006008735
+    ##  [6] -0.646954587  0.095316633  0.143025475 -1.388238016 -0.414866459
+    ## [11]  1.473682003 -1.419569696 -0.326523646  0.649911292  0.826697464
+    ## [16] -1.197970738  1.198421478  0.365217876 -0.084939064  1.174494034
+    ## [21] -1.370773688  0.350509066 -0.563345402  0.968835817 -0.564606499
+    ## [26]  2.014055151  0.975750437 -0.077454424 -0.316461023  1.679231927
 
 ``` r
 # update your function, using conditional execution 
@@ -168,7 +170,7 @@ mean_and_sd(x_vec)  # we get the mean and std deviation
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  2.97  3.95
+    ## 1  3.19  4.21
 
 ## Multiple Inputs
 
@@ -192,7 +194,7 @@ sim_data %>%
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  4.06  2.62
+    ## 1  4.36  2.94
 
 Translating into a function
 
@@ -222,7 +224,7 @@ sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, 
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.37  3.02
+    ## 1  5.67  2.76
 
 ``` r
 # r is assuming first number is the first argument, then second etc 
@@ -236,7 +238,7 @@ sim_mean_sd(sample_size = 100,mu =  6, sigma = 3) # positional matching
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  6.11  2.76
+    ## 1  5.69  2.90
 
 ``` r
 sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example 
@@ -245,7 +247,7 @@ sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.80  3.20
+    ## 1  5.62  3.18
 
 ``` r
 sim_mean_sd(sample_size = 100) # we dont give it the values of the others so will rely on the default
@@ -254,7 +256,7 @@ sim_mean_sd(sample_size = 100) # we dont give it the values of the others so wil
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  3.06  4.37
+    ## 1  3.05  4.28
 
 # Lets review Napolean Dynamite
 
@@ -379,12 +381,8 @@ Lets try the function.
 dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
 
 read_page_reviews(dynamite_url)
-```
 
-    ## # A tibble: 0 × 3
-    ## # ℹ 3 variables: title <chr>, stars <dbl>, text <chr>
 
-``` r
 #we dont have to copy the code and can pass whenever we need to or want to add another element. We can make a change inside of the function
 ```
 
@@ -409,4 +407,54 @@ read_page_reviews(dynamite_urls[3]),
 read_page_reviews(dynamite_urls[4]),
 read_page_reviews(dynamite_urls[5])
 )
+```
+
+## Mean scoping example
+
+``` r
+f = function(x) {
+  z = x + y 
+  z
+}
+
+x =1 
+y = 2
+
+f(x = y) 
+
+
+# answer returns 4, when say x=y , says take 2 and plug intot the function, now thats in the function of the global environment and creates 4 
+
+
+f = function(x) {
+  z = x1 + x2 
+  z
+}
+
+x =1 
+y = 2
+
+f(x1 = 2)  # doesnt work and doesnt exists. So writing a complicated function can end up with something that breaks. You'll get an error due to scoping easily. 
+```
+
+## Functions as arguemtents
+
+Have functiona and pass into vector Have function that can pass into a
+function
+
+``` r
+my_summary= function( x, summ_func){
+  
+ summ_func(x)
+   
+}
+
+x_vec = rnorm(100, 3, 7)
+
+mean(x_vec)
+median(x_vec)
+
+mu_summary(x_vec, IQR) 
+
+# thinking why do this? we have done it like reordering factors according to mean or the median. Other reason is bc of forshadowing and its a function we want to apply as an arguement
 ```
