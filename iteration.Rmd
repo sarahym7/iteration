@@ -8,6 +8,8 @@ output: github_document
 ```{r, setup , message=FALSE}
 library(tidyverse)
 library(rvest)
+library(stringr)
+library(tibble)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -223,9 +225,171 @@ sim_mean_sd(sample_size = 100) # we dont give it the values of the others so wil
 
 ```
 
+# Lets review Napolean Dynamite 
+
+GOAL: Go over to amazon and get customer reviews of napolean dynamite and gather it as data. Ie. reading data from the 
+web using rvest 
+
+```{r, eval = FALSE}
+
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles =
+  dynamite_html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+   dynamite_html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
 
 
+review_text = 
+    dynamite_html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
 
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+
+```
+
+
+What about the next page of reviews?
+
+```{r, eval=FALSE}
+
+
+# page 2 
+
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+dynamite_html = read_html(url)
+
+review_titles =
+  dynamite_html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+   dynamite_html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
+
+
+review_text = 
+    dynamite_html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+
+
+```
+
+we don't want to copy and past and repeat everything twice. It will be annoying. So we will do something different. 
+Lets turn this code into  a function. The only input we have that changes is the pages,so whats the structure? Here its just the URL.
+
+```{r}
+
+read_page_reviews = function(url){ #instead of copying we want give a url, read html, get rev title, star text and return obj
+html = read_html(url)
+
+review_titles =
+  html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+  html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
+
+
+review_text = 
+  html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
+
+reviews = 
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+)
+
+reviews #(output)
+
+}
+
+
+```
+
+
+Lets try the function.
+
+```{r}
+
+dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+read_page_reviews(dynamite_url)
+
+
+#we dont have to copy the code and can pass whenever we need to or want to add another element. We can make a change inside of the function
+
+```
+
+Lets read a few pages of reviews. 
+- setting stage for next vids 
+- lets suppose we have the dynamite URL base. Will be everything upto the page we are insterested in.
+ - combine the url base with the numbers 1-5 
+ 
+ 
+```{r, eval = FALSE}
+dynamite_url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber="
+
+dynamite_urls = str_c(dynamite_url_base, 1:5) # dont love that its a vector but if we want the first page 
+dynamite_urls[[1]]
+
+# so instead we can do this 
+# intermediate spot to say we've got a function and the function works but we should see if we want to do it again for 50 we dont want to write it down 50 times 
+
+all_reviews = 
+bind_rows(
+read_page_reviews(dynamite_urls[1]),
+read_page_reviews(dynamite_urls[2]),
+read_page_reviews(dynamite_urls[3]),
+read_page_reviews(dynamite_urls[4]),
+read_page_reviews(dynamite_urls[5])
+)
+
+
+```
 
 
 

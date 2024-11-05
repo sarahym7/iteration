@@ -6,6 +6,8 @@ Sarahy Martinez
 ``` r
 library(tidyverse)
 library(rvest)
+library(stringr)
+library(tibble)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -32,11 +34,11 @@ x_vec = rnorm(30, mean = 5, sd = 3)
 (x_vec - mean(x_vec))/ sd(x_vec)  # these are z scores now, kind of thing we cant to do in a body of function
 ```
 
-    ##  [1]  1.13830013  0.18801052  0.72988489 -0.06349911 -1.48251801  0.95133522
-    ##  [7]  1.05027172  0.43804489 -0.82358234 -1.00981510 -0.89158509 -2.21026178
-    ## [13]  1.67608632 -1.04579894 -1.39562911  0.52811385  0.53878269 -0.35513807
-    ## [19]  0.09524656  0.18723617 -1.41606286  1.19490931  1.21453866  1.14320106
-    ## [25]  0.38994384 -0.59726052 -0.71314502 -0.67263019  1.02207021  0.19095007
+    ##  [1]  1.20624667  1.85966525  0.01848997  2.06198939 -1.05976314  0.47909984
+    ##  [7] -1.16622956 -0.22388832  0.22466539 -1.41284717  0.17237623 -0.58245993
+    ## [13] -0.02292778 -1.24429900  0.07976235 -0.73457782  1.89281996 -0.35561902
+    ## [19] -1.17378989 -1.36800208  0.23110993 -0.38724064 -0.54885782 -0.59757416
+    ## [25] -1.07633997  0.85084099  1.37500412  0.14408864  0.56767558  0.79058197
 
 I want a function to compute z scores
 
@@ -55,11 +57,11 @@ return(z)
 z_scores(x_vec)    #same answer as function above! 
 ```
 
-    ##  [1]  1.13830013  0.18801052  0.72988489 -0.06349911 -1.48251801  0.95133522
-    ##  [7]  1.05027172  0.43804489 -0.82358234 -1.00981510 -0.89158509 -2.21026178
-    ## [13]  1.67608632 -1.04579894 -1.39562911  0.52811385  0.53878269 -0.35513807
-    ## [19]  0.09524656  0.18723617 -1.41606286  1.19490931  1.21453866  1.14320106
-    ## [25]  0.38994384 -0.59726052 -0.71314502 -0.67263019  1.02207021  0.19095007
+    ##  [1]  1.20624667  1.85966525  0.01848997  2.06198939 -1.05976314  0.47909984
+    ##  [7] -1.16622956 -0.22388832  0.22466539 -1.41284717  0.17237623 -0.58245993
+    ## [13] -0.02292778 -1.24429900  0.07976235 -0.73457782  1.89281996 -0.35561902
+    ## [19] -1.17378989 -1.36800208  0.23110993 -0.38724064 -0.54885782 -0.59757416
+    ## [25] -1.07633997  0.85084099  1.37500412  0.14408864  0.56767558  0.79058197
 
 ``` r
 # update your function, using conditional execution 
@@ -166,7 +168,7 @@ mean_and_sd(x_vec)  # we get the mean and std deviation
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  3.69  3.88
+    ## 1  2.97  3.95
 
 ## Multiple Inputs
 
@@ -190,7 +192,7 @@ sim_data %>%
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  4.20  3.19
+    ## 1  4.06  2.62
 
 Translating into a function
 
@@ -220,7 +222,7 @@ sim_mean_sd(100, 6, 3)  #if we run code multiple times will create a diff mean, 
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  6.35  3.06
+    ## 1  5.37  3.02
 
 ``` r
 # r is assuming first number is the first argument, then second etc 
@@ -234,7 +236,7 @@ sim_mean_sd(sample_size = 100,mu =  6, sigma = 3) # positional matching
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  5.65  2.92
+    ## 1  6.11  2.76
 
 ``` r
 sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example 
@@ -243,7 +245,7 @@ sim_mean_sd(mu = 6, sample_size = 100, sigma = 3) # another example
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  6.00  3.12
+    ## 1  5.80  3.20
 
 ``` r
 sim_mean_sd(sample_size = 100) # we dont give it the values of the others so will rely on the default
@@ -252,4 +254,159 @@ sim_mean_sd(sample_size = 100) # we dont give it the values of the others so wil
     ## # A tibble: 1 × 2
     ##    mean    sd
     ##   <dbl> <dbl>
-    ## 1  3.27  4.00
+    ## 1  3.06  4.37
+
+# Lets review Napolean Dynamite
+
+GOAL: Go over to amazon and get customer reviews of napolean dynamite
+and gather it as data. Ie. reading data from the web using rvest
+
+``` r
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles =
+  dynamite_html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+   dynamite_html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
+
+
+review_text = 
+    dynamite_html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+What about the next page of reviews?
+
+``` r
+# page 2 
+
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+dynamite_html = read_html(url)
+
+review_titles =
+  dynamite_html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+   dynamite_html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
+
+
+review_text = 
+    dynamite_html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+we don’t want to copy and past and repeat everything twice. It will be
+annoying. So we will do something different. Lets turn this code into a
+function. The only input we have that changes is the pages,so whats the
+structure? Here its just the URL.
+
+``` r
+read_page_reviews = function(url){ #instead of copying we want give a url, read html, get rev title, star text and return obj
+html = read_html(url)
+
+review_titles =
+  html %>% 
+  html_nodes(".a-text-bold span") %>% # identified css tags using selectr gadget and will give tag to get the data we want
+  html_text() # converted to text
+
+review_stars =
+  html %>% 
+  html_nodes("#cm_cr-review_list .review-rating") %>% 
+  html_text() %>% 
+  str_extract("^\\d") %>%  #says to get the first digit number between 0 and 9
+  as.numeric() # converted to numeric
+
+
+review_text = 
+  html %>% 
+  html_nodes(".review-text-content span") %>% 
+  html_text() %>% 
+  str_replace_all("\n","") %>%  #trimming off additional spaces 
+  str_trim()
+  
+
+reviews = 
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+)
+
+reviews #(output)
+
+}
+```
+
+Lets try the function.
+
+``` r
+dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+read_page_reviews(dynamite_url)
+```
+
+    ## # A tibble: 0 × 3
+    ## # ℹ 3 variables: title <chr>, stars <dbl>, text <chr>
+
+``` r
+#we dont have to copy the code and can pass whenever we need to or want to add another element. We can make a change inside of the function
+```
+
+Lets read a few pages of reviews. - setting stage for next vids - lets
+suppose we have the dynamite URL base. Will be everything upto the page
+we are insterested in. - combine the url base with the numbers 1-5
+
+``` r
+dynamite_url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviwerType=avp_only_reviews&sortBy=recent&pageNumber="
+
+dynamite_urls = str_c(dynamite_url_base, 1:5) # dont love that its a vector but if we want the first page 
+dynamite_urls[[1]]
+
+# so instead we can do this 
+# intermediate spot to say we've got a function and the function works but we should see if we want to do it again for 50 we dont want to write it down 50 times 
+
+all_reviews = 
+bind_rows(
+read_page_reviews(dynamite_urls[1]),
+read_page_reviews(dynamite_urls[2]),
+read_page_reviews(dynamite_urls[3]),
+read_page_reviews(dynamite_urls[4]),
+read_page_reviews(dynamite_urls[5])
+)
+```
